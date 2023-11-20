@@ -1,0 +1,287 @@
+﻿<Window x:Class="FillingTriangles.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FillingTriangles"
+        mc:Ignorable="d"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        d:DataContext="local:MainWindowHelper"
+        Title="MainWindow" 
+        Width="{Binding WindowWidth, Mode=TwoWay}"
+        Height="{Binding WindowHeight, Mode=TwoWay}"
+        SizeChanged="Window_SizeChanged">
+
+    <Window.Resources>
+        <local:BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:DoubleToTextConverter x:Key="DoubleToText"/>
+        <local:DrawingToMediaColorConverter x:Key="DrawToMediaConv"/>
+    </Window.Resources>
+    
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="220"/>
+        </Grid.ColumnDefinitions>
+    
+        
+        <!-- Drawing Panel-->
+        <Grid x:Name="ImagePlace">
+            <Image 
+               Source="{Binding BitmapImage}" 
+               Canvas.Left="0" Canvas.Top="0"
+               x:Name="BitImage"
+               />
+
+            <Canvas 
+                    Width="{Binding ActualWidth, ElementName=BitImage}"
+                    Height="{Binding ActualHeight, ElementName=BitImage}"
+                    Panel.ZIndex="3" 
+                    Visibility="{Binding IsChecked,
+                ElementName=ShowBezierCB,
+                Converter={StaticResource BoolToVis}}"
+                    Name="BezierCVN">
+                
+            </Canvas>
+            <Canvas 
+        Width="{Binding ActualWidth, ElementName=BitImage}"
+        Height="{Binding ActualHeight, ElementName=BitImage}"
+        Panel.ZIndex="2" 
+        Visibility="{Binding IsChecked,
+    ElementName=ShowGrid,
+    Converter={StaticResource BoolToVis}}"
+        Name="ShapeCVN">
+
+            </Canvas>
+        </Grid>
+
+        <!-- Functional Panel-->
+        <Grid Grid.Column="1" >
+            <StackPanel>
+
+                <GroupBox Header="Triangulation">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="30" />
+
+                            </Grid.ColumnDefinitions>
+                            <Label Content="width" FontSize="13"/>
+                            <Slider Style="{DynamicResource Base}"
+                                     Value="{Binding Vertexs.VerticesWidth}"
+                                     Minimum="3" Maximum="20" TickFrequency="1"
+                                     IsSnapToTickEnabled="True"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center" Grid.Column="1"
+                                    Name="VWidth">
+
+                            </Slider>
+                            <Label Content="{Binding Value, ElementName=VWidth}"
+                                    FontSize="13" Grid.Column="2"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="height" FontSize="13"/>
+                            <Slider Style="{DynamicResource Base}"
+                                     Value="{Binding Vertexs.VerticesHeight}"
+                                     Minimum="3" Maximum="20" TickFrequency="1"
+                                     IsSnapToTickEnabled="True"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center" 
+                                    Grid.Column="1"
+                                    Name="VHeight">
+
+                            </Slider>
+                            <Label Content="{Binding Value,
+                                    ElementName=VHeight}"
+                                    FontSize="13" Grid.Column="2"/>
+                        </Grid>
+
+                        <CheckBox Content="Show Triangle Grid"
+                                  x:Name="ShowGrid" 
+                                  IsChecked="False"
+                                  HorizontalAlignment="Center"
+                                  />
+
+                    </StackPanel>
+                
+                
+                </GroupBox>
+
+                <GroupBox Header="Normal Vectors">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal"
+            HorizontalAlignment="Center">
+
+                        <CheckBox Content="Show Bezier"
+              x:Name="ShowBezierCB" 
+              IsChecked="False"/>
+
+                        <StackPanel Orientation="Horizontal"
+                Visibility="{Binding IsChecked,
+            ElementName=ShowBezierCB,
+            Converter={StaticResource BoolToVis}}"
+                DataContext="{Binding BPH}">
+
+                            <TextBox MinWidth="30" Margin="5 0"
+                 Text="{Binding X,
+            Converter={StaticResource DoubleToText}}"
+                 IsEnabled="False" Background="LightGray"/>
+
+                            <TextBox MinWidth="30" IsEnabled="False"
+                 Background="LightGray"
+                 Text="{Binding Y,
+            Converter={StaticResource DoubleToText}}"/>
+
+
+                            <TextBox MinWidth="30" Margin="5 0"
+                 Text="{Binding Z,
+                 Converter={StaticResource DoubleToText}}"
+                 Background="LightGray"
+                 KeyDown="TextBox_KeyDown"/>
+
+
+                        </StackPanel>
+
+
+                    </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0 5"
+            HorizontalAlignment="Center">
+                            <CheckBox Content="Use Map" 
+              VerticalAlignment="Center"
+              IsChecked="{Binding UseNVTexture}"/>
+                            <Button Content="Vectors Map"
+                            Margin="18,0,0,0" Click="VMapbtn_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                   
+                </GroupBox>
+                
+
+                <GroupBox Header="Coeffients">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Kd"
+                                    HorizontalAlignment="Center"/>
+                            <Slider Grid.Column="1" 
+                                    Value="{Binding KD, Mode=TwoWay}" 
+                                    VerticalAlignment="Center"    
+                                    Minimum="0" Maximum="1"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Ks"
+                                        HorizontalAlignment="Center"/>
+                            <Slider Grid.Column="1" 
+                                        Value="{Binding KS, Mode=TwoWay}" 
+                                        VerticalAlignment="Center"    
+                                        Minimum="0" Maximum="1"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="M "
+                                   HorizontalAlignment="Center"/>
+                            <Slider Grid.Column="1" 
+                                    Value="{Binding M, Mode=TwoWay}" 
+                                    VerticalAlignment="Center"    
+                                    Minimum="1" Maximum="100"
+                                    TickFrequency="1"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Object">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="Object Color"
+                                    HorizontalAlignment="Center"/>
+
+                            <xctk:ColorPicker Name="ObjColor" Grid.Column="1"               
+                                    SelectedColor="{Binding ObjectColor, Mode=TwoWay,
+                                   Converter={StaticResource DrawToMediaConv}}"
+                                      Background="LightGray"
+                                        />
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0 5"
+                                    HorizontalAlignment="Center">
+                            <CheckBox Content="Use texture" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding UseTexture}"/>
+                            <Button Content="Choose texture"
+                                    Margin="18,0,0,0" Click="TextureBtn_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                </GroupBox>
+
+                <GroupBox Header="Light">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="Light Color"
+                                    HorizontalAlignment="Center"/>
+
+                                                    <xctk:ColorPicker Name="LightColor" Grid.Column="1"
+                            SelectedColor="{Binding LightColor, Mode=TwoWay,
+                           Converter={StaticResource DrawToMediaConv}}"
+                            Background="LightGray"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Z "
+                                   HorizontalAlignment="Center"/>
+                                                    <Slider Grid.Column="1" 
+                                   Value="{Binding LightZ, Mode=TwoWay}" 
+                                   VerticalAlignment="Center"    
+                                   Minimum="0.0" Maximum="3"
+                                   TickFrequency="0.1"/>
+                        </Grid>
+                    </StackPanel>
+                    
+                </GroupBox>
+
+                <GroupBox Header="Animation">
+                    <CheckBox Content="Animate"
+                                 IsChecked="{Binding IsAnimating, 
+                                Mode=OneWayToSource}"/>
+                </GroupBox>
+
+
+            </StackPanel>
+        </Grid>
+        
+        
+    </Grid>
+</Window>
